@@ -1,0 +1,5 @@
+/etc/bind
+/var/lib/bind
+/etc/ldap
+/etc/ssl
+/root/SystemBackup
