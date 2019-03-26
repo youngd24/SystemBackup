@@ -3,3 +3,4 @@
 /etc/ldap
 /etc/ssl
 /root/SystemBackup
+/srv/tftp

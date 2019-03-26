@@ -3,3 +3,5 @@
 /etc/ldap
 /etc/ssl
 /root/SystemBackup
+/srv/tftp
+/usr/lib/unifi
