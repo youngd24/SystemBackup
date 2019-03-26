@@ -27,6 +27,11 @@
 ###############################################################################
 #
 # TODO/ISSUES:
+#
+#   * If the backup dir doesn't exist, create it
+#   * Add getopt parsing
+#   * Convert it all over to the new logmsg_p
+#   * Add code to prune files older than X
 # 
 ###############################################################################
 
