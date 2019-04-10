@@ -49,6 +49,7 @@ declare -A HOSTMAP
 ###############################################################################
 HOSTNAME=$(hostname)                            # This hostname
 MYNAME=$(basename $0)                           # Our name
+BASEDIR=$(dirname $0)                           # Base dir for pgm
 DEBUG=""                                        # Set to anything for debug
 
 TAR="/bin/tar"                                  # Where is tar
@@ -61,9 +62,12 @@ LOGFILE="/tmp/$MYNAME.log"                      # Physical log file
 
 BKPHOSTS="dns01 dns02"                          # Hosts to backup to
 BKPDEST="/backups"                              # Dest for backup files
+TARINFILE=""                                    # Input file to feed tar for dirs
 
 HOSTMAP[pi-5232]="dns01"                        # dns01
 HOSTMAP[pi-c2a4]="dns02"                        # dns02
+HOSTMAP[xlog01]="xlog01"                        # xlog01
+HOSTMAP[util01]="util01"                        # util01
 
 THISHOST=${HOSTMAP[$HOSTNAME]}                  # Get this machines host role
 
@@ -242,14 +246,33 @@ logmsg_p "Starting on $(hostname) ($THISHOST)"
 
 DTIME=$(date +%m%d%y-%H%M)
 BKPFILE="$BKPDEST/$THISHOST-$DTIME.tar.gz"
+TARINFILE="$BASEDIR/backupDirs.$THISHOST"
 
-logmsg_p "Input file for backups: backupDirs.$THISHOST"
-logmsg_p "Backup file: $BKPFILE"
+logmsg_p "TARINFILE: $TARINFILE"
+logmsg_p "BASEDIR: $BASEDIR"
+logmsg_p "BKPDEST: $BKPDEST"
+logmsg_p "BKPFILE: $BKPFILE"
 
+# Make sure the tar input file exists
+if [[ ! -f $TARINFILE ]]; then
+    logmsg_p "Tar input file not found"
+    exit 20
+fi
+
+# Make sure the backup directory exists
+if [[ ! -d $BKPDEST ]]; then
+    logmsg_p "Backup directory $BKPDEST does not exist"
+    exit 21
+fi
+
+# Tar up stuff
+# TODO: Move this to run_command
 logmsg_p "Going to tar up dirs"
-tar -zcf $BKPFILE --files-from=backupDirs.$THISHOST 2>&1 | logmsg_p
+tar -zcf $BKPFILE --files-from=$TARINFILE 2>&1 | logmsg_p
 
-logmsg_p "About to upload tarball to Dropbox"
+# Upload tar to Dropbox
+# TODO: Move this to run_command
+logmsg_p "Uploading tarball to Dropbox"
 dropbox_uploader.sh upload "$BKPFILE" "backups/$THISHOST" 2>&1 | logmsg_p
 
 logmsg_p "Done, buh bye"
